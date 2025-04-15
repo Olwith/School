@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>School Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { padding-top: 70px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .nav-link.active { 
+      font-weight: bold; 
+      background-color: rgba(255,255,255,0.1); 
+    }
+    .form-container { background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+    .alert { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">SchoolMS</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active" href="#dashboard">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="#students">Students</a></li>
+          <li class="nav-item"><a class="nav-link" href="#attendance">Attendance</a></li>
+          <li class="nav-item"><a class="nav-link" href="#timetable">Timetable</a></li>
+          <li class="nav-item"><a class="nav-link" href="#staff">Staff</a></li>
+          <li class="nav-item"><a class="nav-link" href="#parents">Parents</a></li>
+        </ul>
+        <div class="d-flex">
+          <button class="btn btn-light" type="button">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Dashboard -->
+    <div id="dashboard" class="page active">
+      <h2>Dashboard</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">Students by Class</div>
+            <div class="card-body">
+              <canvas id="studentChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">Attendance Summary</div>
+            <div class="card-body">
+              <canvas id="attendanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students -->
+    <div id="students" class="page">
+      <h2>Student Management</h2>
+      
+      <div class="form-container">
+        <h4>Add New Student</h4>
+        <form id="studentForm" class="row g-3">
+          <div class="col-md-4">
+            <input type="text" id="studentName" class="form-control" placeholder="Full Name" required>
+          </div>
+          <div class="col-md-2">
+            <input type="number" id="studentAge" class="form-control" placeholder="Age" min="5" max="25" required>
+          </div>
+          <div class="col-md-3">
+            <input type="text" id="studentClass" class="form-control" placeholder="Class/Grade" required>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Add Student</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Current Students</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Age</th>
+                  <th>Class</th>
+                </tr>
+              </thead>
+              <tbody id="studentsTableBody">
+                <!-- Sample data for frontend testing -->
+                <tr>
+                  <td>1</td>
+                  <td>John Doe</td>
+                  <td>15</td>
+                  <td>10th Grade</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Jane Smith</td>
+                  <td>14</td>
+                  <td>9th Grade</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance -->
+    <div id="attendance" class="page">
+      <h2>Attendance Records</h2>
+      
+      <div class="form-container">
+        <h4>Mark Attendance</h4>
+        <form id="attendanceForm" class="row g-3">
+          <div class="col-md-3">
+            <select id="attendanceStudent" class="form-control" required>
+              <option value="" disabled selected>Select Student</option>
+              <option value="1">John Doe (ID: 1)</option>
+              <option value="2">Jane Smith (ID: 2)</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="date" id="attendanceDate" class="form-control" required>
+          </div>
+          <div class="col-md-3">
+            <select id="attendanceStatus" class="form-control" required>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Record Attendance</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Attendance History</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Student</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTableBody">
+                <!-- Sample data for frontend testing -->
+                <tr>
+                  <td>John Doe</td>
+                  <td>2023-05-15</td>
+                  <td><span class="badge bg-success">Present</span></td>
+                </tr>
+                <tr>
+                  <td>Jane Smith</td>
+                  <td>2023-05-15</td>
+                  <td><span class="badge bg-danger">Absent</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timetable -->
+    <div id="timetable" class="page">
+      <h2>Class Timetables</h2>
+      
+      <div class="form-container">
+        <h4>Add Timetable Entry</h4>
+        <form id="timetableForm" class="row g-3">
+          <div class="col-md-3">
+            <input type="text" id="timetableClass" class="form-control" placeholder="Class/Grade" required>
+          </div>
+          <div class="col-md-2">
+            <select id="timetableDay" class="form-control" required>
+              <option value="" disabled selected>Day</option>
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="text" id="timetableSubject" class="form-control" placeholder="Subject" required>
+          </div>
+          <div class="col-md-2">
+            <input type="time" id="timetableTime" class="form-control" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Add Entry</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Current Timetable</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Class</th>
+                  <th>Day</th>
+                  <th>Subject</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="timetableTableBody">
+                <!-- Sample data for frontend testing -->
+                <tr>
+                  <td>10th Grade</td>
+                  <td>Monday</td>
+                  <td>Mathematics</td>
+                  <td>09:00</td>
+                </tr>
+                <tr>
+                  <td>9th Grade</td>
+                  <td>Tuesday</td>
+                  <td>Science</td>
+                  <td>10:30</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Staff -->
+    <div id="staff" class="page">
+      <h2>Staff Management</h2>
+      
+      <div class="form-container">
+        <h4>Add Staff Member</h4>
+        <form id="staffForm" class="row g-3">
+          <div class="col-md-4">
+            <input type="text" id="staffName" class="form-control" placeholder="Full Name" required>
+          </div>
+          <div class="col-md-3">
+            <input type="text" id="staffRole" class="form-control" placeholder="Role/Position" required>
+          </div>
+          <div class="col-md-3">
+            <input type="tel" id="staffContact" class="form-control" placeholder="Phone Number" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Add Staff</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Current Staff</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Contact</th>
+                </tr>
+              </thead>
+              <tbody id="staffTableBody">
+                <!-- Sample data for frontend testing -->
+                <tr>
+                  <td>Mr. Johnson</td>
+                  <td>Math Teacher</td>
+                  <td>555-0101</td>
+                </tr>
+                <tr>
+                  <td>Ms. Williams</td>
+                  <td>Science Teacher</td>
+                  <td>555-0102</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parents -->
+    <div id="parents" class="page">
+      <h2>Parent Information</h2>
+      
+      <div class="form-container">
+        <h4>Add Parent Information</h4>
+        <form id="parentForm" class="row g-3">
+          <div class="col-md-3">
+            <select id="parentStudent" class="form-control" required>
+              <option value="" disabled selected>Select Student</option>
+              <option value="1">John Doe (ID: 1)</option>
+              <option value="2">Jane Smith (ID: 2)</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="parentName" class="form-control" placeholder="Parent Name" required>
+          </div>
+          <div class="col-md-3">
+            <input type="tel" id="parentPhone" class="form-control" placeholder="Phone Number" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Add Parent</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Parent Contacts</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Student</th>
+                  <th>Parent</th>
+                  <th>Phone</th>
+                </tr>
+              </thead>
+              <tbody id="parentsTableBody">
+                <!-- Sample data for frontend testing -->
+                <tr>
+                  <td>John Doe</td>
+                  <td>Mr. Doe</td>
+                  <td>555-0201</td>
+                </tr>
+                <tr>
+                  <td>Jane Smith</td>
+                  <td>Mrs. Smith</td>
+                  <td>555-0202</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Page Navigation
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize the first page based on URL hash
+      const initialPage = window.location.hash.substring(1) || 'dashboard';
+      showPage(initialPage);
+      
+      // Set up navigation
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const pageId = this.getAttribute('href').substring(1);
+          showPage(pageId);
+          window.location.hash = pageId;
+        });
+      });
+      
+      // Initialize charts with sample data
+      const studentCtx = document.getElementById('studentChart').getContext('2d');
+      const studentChart = new Chart(studentCtx, {
+        type: 'bar',
+        data: {
+          labels: ['9th Grade', '10th Grade', '11th Grade', '12th Grade'],
+          datasets: [{
+            label: 'Number of Students',
+            data: [25, 30, 22, 28],
+            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          }
+        }
+      });
+
+      const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+      const attendanceChart = new Chart(attendanceCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Present', 'Absent'],
+          datasets: [{
+            data: [85, 15],
+            backgroundColor: ['#4CAF50', '#F44336'],
+            borderWidth: 1
+          }]
+        }
+      });
+
+      // Form submission handlers (frontend only)
+      document.getElementById('studentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Student added (demo only - no backend)');
+      });
+
+      document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Attendance recorded (demo only - no backend)');
+      });
+
+      document.getElementById('timetableForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Timetable entry added (demo only - no backend)');
+      });
+
+      document.getElementById('staffForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Staff member added (demo only - no backend)');
+      });
+
+      document.getElementById('parentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Parent information added (demo only - no backend)');
+      });
+    });
+
+    function showPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      
+      // Show the selected page
+      const pageElement = document.getElementById(pageId);
+      if (pageElement) {
+        pageElement.classList.add('active');
+      }
+      
+      // Update active nav link
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${pageId}`) {
+          link.classList.add('active');
+        }
+      });
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
